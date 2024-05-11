@@ -1,13 +1,15 @@
-const { Pool } = require("pg");
+import pgPromise from "pg-promise";
 
-const pool = new Pool({
-  user: "postgresql",
-  password: "postgresql",
+const pgp = pgPromise({});
+
+const dbConfig = {
+  user: "postgres",
+  password: "Afterglow2019!",
   host: "localhost",
   port: 5432,
-  database: "community",
-});
-
-module.exports = {
-  query: (text, params) => pool.query(text, params),
+  database: "backend",
 };
+
+const db = pgp(dbConfig);
+
+export default db;
