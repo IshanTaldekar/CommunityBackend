@@ -31,4 +31,14 @@ replyRouter.delete("/delete", authenticateToken, async (req, res) => {
   return res.status(result.status).json({ message: result.message });
 });
 
+replyRouter.get("/get", authenticateToken, async (req, res) => {
+  const { threadId } = req.body;
+
+  const result = await ReplyDao.getAllReplies(threadId);
+
+  return res
+    .status(result.status)
+    .json({ message: result.message, replies: result.replies });
+});
+
 export default replyRouter;

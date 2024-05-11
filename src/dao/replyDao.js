@@ -69,6 +69,52 @@ class ReplyDao {
       message: "Internal server error",
     };
   }
+
+  static async getAllReplies(threadId) {
+    try {
+      const result = await db.manyOrNone(
+        `SELECT r.response_message_id, r.original_message_id, r.user_id as replying_user_id, m.body, ml.latitude, ml.longitude
+        FROM public.Reply as r
+            JOIN public.Message as m ON r.response_message_id = m.message_id
+            LEFT JOIN public.MessageLocation as ml ON r.response_message_id = ml.message_id
+        WHERE r.thread_id = $1
+        ORDER BY r.response_message_id;`,
+        [threadId],
+      );
+
+      if (result.length === 0) {
+        return {
+          status: 200,
+          message: "No replies found",
+          replies: [],
+        };
+      }
+
+      const threadReplies = result.map((element) => {
+        return {
+          responseMessageId: element.response_message_id,
+          originalMessageId: element.original_message_id,
+          replyingUserId: element.replying_user_id,
+          messageBody: element.body,
+          latitude: element.latitude,
+          longitude: element.longitude,
+        };
+      });
+
+      return {
+        status: 200,
+        message: "Thread replies retrieved",
+        replies: threadReplies,
+      };
+    } catch (error) {
+      console.error(error);
+    }
+
+    return {
+      status: 500,
+      message: "Internal server error",
+    };
+  }
 }
 
 export default ReplyDao;
